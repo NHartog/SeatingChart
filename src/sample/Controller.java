@@ -1,6 +1,9 @@
 package sample;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -16,8 +19,11 @@ import org.w3c.dom.css.Rect;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class Controller {
+
+    //instance variables. All the FXML objects are here
     @FXML public GridPane seatingChart;
     @FXML public Rectangle zz;
     @FXML public Rectangle zo;
@@ -73,7 +79,8 @@ public class Controller {
 
     @FXML public Text masterText;
 
-    int row,col = 0;
+    //non FXML instance variables
+    int row,col,rowt,colt,in,ino = 0;
     Student[][] seats = new Student[5][5];
     //Text[][] text = new Text[5][5];
     ArrayList<Text> tlist = new ArrayList<Text>();
@@ -84,12 +91,13 @@ public class Controller {
     public Student temp = null;
     public Student tempTwo = null;
     public int clicks = 0;
+    public int emptySeats = 0;
 
     public boolean nullified = false;
 
 
 
-
+    //initializes the frames and the program
     public void initialize(){
         for(int c  =  0; c<5; c++){
             for(int r = 0; r<5; r++){
@@ -128,29 +136,31 @@ public class Controller {
         preClass.add(new Student("Sebastian, Paulis", 0, 2,2));
         preClass.add(new Student("Pipe, Cruz", 0, 3,3));
         preClass.add(new Student("Atlas, Baily", 0, 4,4));
-        preClass.add(new Student("Alexis, Hartog", 1, 0,5));
+        preClass.add(new Student("Jonathan, Perez", 1, 0,5));
         preClass.add(new Student("Jonathan, Fontanez", 1, 1,6));
-        preClass.add(new Student("Jonathan, Perez", 1, 2,7));
+        preClass.add(new Student("Alexis, Hartog", 1, 2,7));
         preClass.add(new Student("Trevor, Taplin", 1, 3,8));
         preClass.add(new Student("River, Ferrand", 1, 4,9));
         preClass.add(new Student("Kelton, Pickering", 2, 0,10));
         preClass.add(new Student("Calvin, Pell", 2, 1,11));
-        preClass.add(new Student("Nick, LINDER", 2, 2,12));
-        preClass.add(new Student("Joel, Cruz", 2, 3,13));
+        preClass.add(new Student("Nicholas, Hartog", 2, 2,12));
+        preClass.add(new Student("Hector, Escobedo", 2, 3,13));
         preClass.add(new Student("Ronald, Ben", 2, 4,14));
         preClass.add(new Student("Matthew, Perez", 3, 0,15));
         preClass.add(new Student("Emmanuel, Eman", 3, 1,16));
-        preClass.add(new Student("Hector, Escobedo", 3, 2,17));
+        preClass.add(new Student("Joel, Cruz", 3, 2,17));
         preClass.add(new Student("Rico, Rico", 3, 3,18));
         preClass.add(new Student("Oscar, Molina", 3, 4,19));
         preClass.add(new Student("Ethan, Dunnigan", 4, 0,20));
         preClass.add(new Student("Ariel, Otero", 4, 1,21));
         preClass.add(new Student("Guiliana, Petruz", 4, 2,22));
         preClass.add(new Student("Greg, Rodriguez", 4, 3,23));
-        preClass.add(new Student("Nicholas, Hartog", 4, 4,24));
+        preClass.add(new Student("Nick, LINDER", 4, 4,24));
 
 
     }
+
+    //checks if any of the images have been clicked and checks which one
 
     public void rectClicked(@NotNull MouseEvent mouseEvent){
         if (mouseEvent.getSource() == zz) {
@@ -230,11 +240,10 @@ public class Controller {
         }
     }
 
-    private void whenClicked(int i, int c, int r, Rectangle re, Text te) {
+    //depending on which seat is clicked, along with seat availanlity, a certain task will occur
+    private void whenClicked(int i, int c, int r, @NotNull Rectangle re, Text te) {
         clicks++;
         re.setFill(Color.YELLOW);
-        col = c;
-        row = r;
         selected.add(seats[c][r]);
         if(seats[c][r]== null){
             nullified = true;
@@ -245,41 +254,25 @@ public class Controller {
         }
         if (clicks == 1) {
             temp = seats[c][r];
+            col = c;
+            row = r;
+            in = i;
+            System.out.print(c);
+            System.out.println(r);
         }
         if(clicks == 2){
             tempTwo = seats[c][r];
+            colt = c;
+            rowt = r;
+            ino = i;
+            System.out.print(c);
+            System.out.println(r);
         }
     }
 
-    public void disable(){
-        zz.setDisable(true);
-        zo.setDisable(true);
-        zt.setDisable(true);
-        zth.setDisable(true);
-        zf.setDisable(true);
-        oz.setDisable(true);
-        oo.setDisable(true);
-        ot.setDisable(true);
-        oth.setDisable(true);
-        of.setDisable(true);
-        tz.setDisable(true);
-        to.setDisable(true);
-        tt.setDisable(true);
-        tth.setDisable(true);
-        tf.setDisable(true);
-        thz.setDisable(true);
-        tho.setDisable(true);
-        tht.setDisable(true);
-        thth.setDisable(true);
-        thf.setDisable(true);
-        fz.setDisable(true);
-        fo.setDisable(true);
-        ft.setDisable(true);
-        fth.setDisable(true);
-        ff.setDisable(true);
-    }
-
+    // reanables all images to be intereacted with, also resets the color
     public void enable(){
+        emptySeats = 0;
         zz.setDisable(false);
         zo.setDisable(false);
         zt.setDisable(false);
@@ -333,40 +326,81 @@ public class Controller {
         ff.setFill(Color.rgb(92,60,33));
 
         clicks = 0;
+        nullified = false;
+        selected.clear();
+
+        for(int co = 0; co < 5; co++){
+            for(int ro = 0; ro<5; ro++){
+                if(seats[co][ro] == null){
+                    emptySeats++;
+                }
+            }
+        }
+        System.out.println(emptySeats);
     }
 
+
+    //when a certain condition is met when a seat is clicked, this meathod will be called yo see if and where a student can be added
     public void add() {
         int cnt = 0;
-
+        String names = studNames.getText();
+       // System.out.println(emptySeats);
+        System.out.println(clicks);
         if(clicks> 1){
             masterText.setText("You can only select one seat to add to");
             clicks = 0;
             nullified = false;
+            enable();
         }
-        else {
+        else{
             for (int c = 0; c < seats[0].length; c++) {
                 for (int r = 0; r < seats.length; r++) {
-                    if (clicks == 0) {
-                        if (seats[c][r] == null) {
-                            seats[c][r] = new Student(studNames.getText(), c, r, cnt);
-                            studNames.clear();
-                            update(c, r, cnt);
-                            return;
-                        }
-                    } else if (clicks == 1) {
+                    if (clicks == 1) {
                         if (c == col && r == row) {
+                            if(names.contains(",")){
+                                masterText.setText("When selecting a desk, you may only add one student");
+                            }
                             if (seats[col][row] == null) {
                                 seats[c][r] = new Student(studNames.getText(), c, r, cnt);
                                 studNames.clear();
                                 update(c, r, cnt);
+                                masterText.setText("Welcome new student!");
+                                enable();
                                 return;
                             } else {
                                 masterText.setText("This seat is taken");
                                 clicks = 0;
                                 enable();
+                                return;
                             }
                         }
-                    } else {
+                    }
+                    else if(clicks == 0){
+                        enable();
+                        if (seats[c][r] == null && clicks == 0 && !names.equals("")) {
+//                    students[r][c].set_studentName("Testing fixme");
+                            if (names.contains(",")) {
+                                seats[c][r] = new Student(names.substring(0, names.indexOf(",") + 1), c, r, cnt);
+                                names = names.substring(names.indexOf(",") + 2);
+                                update(c, r, cnt);
+                                masterText.setText("Welcome new student!");
+                                System.out.println(names);
+                            } else {
+                                System.out.println(names);
+                                seats[c][r] = new Student(names, c, r, cnt);
+                                studNames.setText("");
+                                update(c, r, cnt);
+                                masterText.setText("Welcome new student!");
+                                return;
+                            }
+                        }
+                        else if(emptySeats == 0 && names.length()>2 && clicks == 0){
+                            masterText.setText("Not enough seats for all of them");
+                            studNames.setText("");
+                            return;
+                        }
+                    }
+                     else if(clicks> 1) {
                         masterText.setText("You can only select one seat to add to");
                         clicks = 0;
                         enable();
@@ -375,29 +409,26 @@ public class Controller {
                     cnt++;
                 }
             }
+            selected.clear();
+
         }
-        selected.clear();
-        enable();
-//        temp = null;
-//        tempTwo = null;
+
     }
 
+    //updates the seat arrangements
     public void update(int c, int r, int cont){
        // System.out.println(seats[c][r].getName());
-
         if(seats[c][r] == null){
             tlist.get(cont).setFill(Color.rgb(29,255,0));
             tlist.get(cont).setText("Empty");
         }
         else{
-            String s = seats[c][r].getName().substring(0, seats[c][r].getName().indexOf(" ") + 2);
             tlist.get(cont).setFill(Color.DARKBLUE);
-            tlist.get(cont).setText(s);
+            tlist.get(cont).setText(seats[c][r].getName().substring(0,seats[c][r].getName().indexOf(" ") +2));
         }
-
     }
 
-
+    //based on which is clicked, will remove that object from seat
     public void removeStud(MouseEvent event) { //fixme ake list if selected
         if(clicks == 0){
             masterText.setText("You need to select at least one student to remove");
@@ -426,6 +457,7 @@ public class Controller {
 //        tempTwo = null;
     }
 
+    //when button is clicked, this method will initialize preset class
     public void setClass(MouseEvent event) {
         int cnt = 0;
         for(int c = 0; c<5; c++){
@@ -436,14 +468,14 @@ public class Controller {
             }
         }
         enable();
-//        temp = null;
-//        tempTwo = null;
-    }
 
+    }
+    //when exit button is clicked exit
     public void exit(MouseEvent event) {
         System.exit(0);
     }
 
+    //when clicked, swaps two syidemts seats
     public void swap(MouseEvent event) {
         if(clicks != 2){
             masterText.setText("You must select two students");
@@ -480,12 +512,54 @@ public class Controller {
         enable();
     }
 
+    //Basically a to String method to broadcast player actions and student names
+
     public void setMasterText(String str){
         if(str.equals("swap")){
             masterText.setText(temp.getName().substring(0, (temp.getName().indexOf(" ") + 2)) + " had to switch seats with " +
                     tempTwo.getName().substring(0, tempTwo.getName().indexOf(" ") + 2));
         }
         if(str.equals("rem")){
+            if(temp.getName().equals("Jenny, Juarez")){
+                masterText.setText(temp.getName().substring(0, (temp.getName().indexOf(" ") + 2)) + " didn't give Nicholas top program so she removed herself");
+                return;
+            }
+            else if(temp.getName().equals("Alexis, Hartog")){
+                masterText.setText(temp.getName().substring(0, (temp.getName().indexOf(" ") + 2)) + " [REDACTED] so she was remoced");
+                return;
+            }
+            else if(temp.getName().equals("Jonathan, Fontanez")){
+                masterText.setText(temp.getName().substring(0, (temp.getName().indexOf(" ") + 2)) + " didn't give Nicholas top program so he removed herself");
+                return;
+            }
+            else if(temp.getName().equals("Joel, Cruz")){
+                masterText.setText(temp.getName().substring(0, (temp.getName().indexOf(" ") + 2)) + " didn't return the USBs so he was kicked");
+                return;
+            }
+            else if(temp.getName().equals("Kelton, Pickering")){
+                masterText.setText(temp.getName().substring(0, (temp.getName().indexOf(" ") + 2)) + " wasn't using the imperial system and we don't want an enemy of the state");
+                return;
+            }
+            else if(temp.getName().equals("River, Ferrand")){
+                masterText.setText("Its River, what did you expect");
+                return;
+            }
+            else if(temp.getName().equals("Rico, Rico")){
+                masterText.setText(temp.getName().substring(0, (temp.getName().indexOf(" ") + 2)) + " took out too many sheets of paper and we don't want to kill the trees");
+                return;
+            }
+            else if(temp.getName().equals("Trevor, Taplin")){
+                masterText.setText(temp.getName().substring(0, (temp.getName().indexOf(" ") + 2)) + " was too smart for this class so they sent him to NASA");
+                return;
+            }
+            else if(temp.getName().equals("Nick, Linder")){
+                masterText.setText("LINDERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
+                return;
+            }
+            else if(temp.getName().equals("Nicholas, Hartog")){
+                masterText.setText("How dare you remove the creator of this project. You should be ashamed");
+                return;
+            }
             int rand = (int)(Math.random()*4);
             if(rand == 0){
                 masterText.setText(temp.getName().substring(0, (temp.getName().indexOf(" ") + 2)) + " did some unholy things and had to go");
@@ -498,5 +572,93 @@ public class Controller {
             }
 
         }
+    }
+
+
+    //if button pressed and students seats selected, move them
+    public void move(MouseEvent event) {
+        if(clicks!=2 && (temp != null || tempTwo != null)){
+            masterText.setText("You can only select one student and an empty seat");
+            enable();
+        }
+        else if(temp != null && tempTwo!= null){
+            masterText.setText("You must select an empty seat");
+            enable();
+        }
+        if(temp == null){
+
+            seats[col][row] = tempTwo;
+            seats[colt][rowt] = null;
+
+            tempTwo.setCol(col);
+            tempTwo.setRow(row);
+            tempTwo.setIndex(in);
+            enable();
+            update(col,row,in);
+            update(colt,rowt,ino);
+            masterText.setText(tempTwo.getName() + " was moved to a new seat");
+
+        }
+        else if(tempTwo == null){
+
+            seats[colt][rowt] = temp;
+            seats[col][row] = null;
+
+            temp.setCol(colt);
+            temp.setRow(rowt);
+            temp.setIndex(ino);
+            enable();
+            update(col,row,in);
+            update(colt,rowt,ino);
+            masterText.setText(temp.getName() + " was moved to a new seat");
+
+        }
+
+    }
+
+
+    //if how to button is pressed, bring up window with intruction on what to do
+    public void howTo(MouseEvent event) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Instructions");
+        alert.setHeaderText("How To Use Seating Chart");
+        alert.setContentText("Welcome to a seating chart program. Not that complicated but we will get to it\n" +
+                "ADDING STUDENTS: When adding students, make sure you follow the following format:\n" +
+                "First Last. For example: Nicholas Hartog\n" +
+                "If you wnat to add multiple students, do the following: \n" +
+                "Firs Last, First Last, First Last (notice the spacebar after the comma) Makes sure the last name added does not end in a comma. Example:\n" +
+                "Nicholas Hartog, Pipe Cruz, Jonah Kandel\n" +
+                "REMOVING STUDENTS: When removing students, click as many students as you want to be removed.\n" +
+                "Selecting empty seats won't do anything because common sense. Removing students also\n" +
+                "gives a special message. For some specific names, there are specific messages\n." +
+                "MOVING STUDENTS: Select a student and an empty seat and click move. That student\n" +
+                "will move to that empty seat\n" +
+                "SWAPPING STUDENTS: Select two seats with students and then click swap. They will have their seats swapped\n" +
+                "PRE SET CLASS: Fills all the seats with students. Will overwrite current seating\n" +
+                "CLEAR SEATS: Removes all students from the class" );
+        ButtonType buttonTypeOne = new ButtonType("I understand");
+        alert.getButtonTypes().setAll(buttonTypeOne);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == buttonTypeOne) {
+            // ... user chose "One"
+            System.out.println("kept playing");
+        }
+    }
+
+    //button clears all seats
+    public void clearClass(MouseEvent event) {
+        int cnt = 0;
+        for(int c = 0; c<5;c++){
+            for(int r = 0; r<5; r++){
+                seats[c][r] = null;
+                update(c,r,cnt);
+                cnt++;
+            }
+        }
+    }
+
+    //if a selected seat is reclicked, deselect it
+    public void deselect(MouseEvent event) {
+        enable();
     }
 }
